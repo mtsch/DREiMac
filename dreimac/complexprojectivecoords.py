@@ -70,7 +70,7 @@ class ComplexProjectiveCoords(EMCoords):
             TODO
         """
 
-        HARDCODE = True
+        HARDCODE = False
 
         if HARDCODE:
             # TODO: generalize
@@ -228,29 +228,18 @@ class ComplexProjectiveCoords(EMCoords):
         # dimension of projective space to project onto
         proj_dim = 1
 
-        # for i in range(class_map.shape[0]-proj_dim-1):
-        for i in [1, 2]:
+        for i in range(class_map.shape[1]-proj_dim-1):
             UU, S, _ = np.linalg.svd(X)
-            ##print("singular vals", S)
-            # print("norm UU", np.linalg.norm(UU))
-            ##print("norm X", np.linalg.norm(X,axis=1))
             # variance[-i] = np.mean(
             #    (np.pi/2 - np.arccos(np.abs(UU[:,-1].T @ X)))**2
             # )
             Y = np.conjugate(UU.T) @ X
             y = Y[-1, :]
-            ##print(np.linalg.norm(y))
             Y = Y[:-1, :]
-            # print(Y.shape)
-            ##print(np.sqrt( 1 - np.abs(y)**2 ).shape)
             X = np.divide(Y, np.sqrt(1 - np.abs(y) ** 2))
-            ##print("X", X)
 
+        coords = np.zeros((X.shape[1], 2 * X.shape[0]))
+        coords[:, ::2] = np.real(X).T
+        coords[:, 1::2] = np.imag(X).T
 
-        Z = np.zeros((2 * X.shape[0], X.shape[1]))
-        print(Z.shape)
-        Z[::2, :] = np.real(X)
-        Z[1::2, :] = np.imag(X)
-        projData = Z
-
-        return projData
+        return coords
