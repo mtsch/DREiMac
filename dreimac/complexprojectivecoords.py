@@ -14,6 +14,8 @@ from .combinatorial import (
 )
 
 
+
+
 class ComplexProjectiveCoords(EMCoords):
     def __init__(
         self, X, n_landmarks, distance_matrix=False, prime=41, maxdim=2, verbose=False
@@ -101,9 +103,7 @@ class ComplexProjectiveCoords(EMCoords):
             )
         else:
             homological_dimension = 2
-            cohomdeath_rips, cohombirth_rips, cocycle = self.get_representative_cocycle(
-                cohomology_class, homological_dimension
-            )
+            cohomdeath_rips, cohombirth_rips, cocycle = self.get_representative_cocycle(cohomology_class,homological_dimension)
 
         standard_range = False
 
@@ -129,52 +129,106 @@ class ComplexProjectiveCoords(EMCoords):
         )
 
         # integrate cocycle
-        integral = lsqr(delta1, integer_cocycle_as_vector)[0]
-        harmonic_representative = integer_cocycle_as_vector - delta1 @ integral
+        nu_ = lsqr(delta1, integer_cocycle_as_vector)[0]
+        harmonic_representative = integer_cocycle_as_vector - delta1 @ nu_
 
-        # assemble classifying map
+        #turn cocycle into tensor
+        def two_cocycle_to_tensor(cocycle:np.ndarray, dist_mat: np.ndarray, threshold: float, lookup_table: np.ndarray):
+            n_points = dist_mat.shape[0]
+            n_edges = (n_points * (n_points - 1)) // 2
+            n_faces = number_of_simplices_of_dimension(2, n_points, lookup_table)
+
+            res = np.zeros((n_points,n_points,n_points))
+
+            #@jit(fastmath=True)
+            def _get_res(
+                cocycle:np.ndarray, 
+                dist_mat: np.ndarray,
+                threshold: float,
+                lookup_table: np.ndarray,
+                n_points: int,
+                res: np.ndarray,
+            ):
+                for i in range(n_points):
+                    for j in range(i + 1, n_points):
+                        if dist_mat[i, j] < threshold:
+                            for k in range(j + 1, n_points):
+                                if (
+                                    dist_mat[i, k] < threshold
+                                    and dist_mat[j, k] < threshold
+                                ):
+                                    flat_index = combinatorial_number_system_d2_forward(
+                                        i, j, k, lookup_table
+                                    )
+                                    val = cocycle[flat_index]
+                                    #012
+                                    res[i,j,k] = val
+                                    #021
+                                    res[i,k,j] = -val
+                                    #102
+                                    res[j,i,k] = -val
+                                    #210
+                                    res[k,j,i] = -val
+                                    #201
+                                    res[k,i,j] = val
+                                    #120
+                                    res[j,k,i] = val
+
+            _get_res(cocycle, dist_mat, threshold, lookup_table, n_points, res)
+        
+            return res
+
+        def one_cocycle_to_tensor(cocycle:np.ndarray, dist_mat: np.ndarray, threshold: float, lookup_table: np.ndarray):
+            n_points = dist_mat.shape[0]
+            n_edges = (n_points * (n_points - 1)) // 2
+
+            res = np.zeros((n_points,n_points))
+
+            #@jit(fastmath=True)
+            def _get_res(
+                cocycle:np.ndarray, 
+                dist_mat: np.ndarray,
+                threshold: float,
+                lookup_table: np.ndarray,
+                n_points: int,
+                res: np.ndarray,
+            ):
+                for i in range(n_points):
+                    for j in range(i + 1, n_points):
+                        if dist_mat[i, j] < threshold:
+                                flat_index = combinatorial_number_system_d1_forward(
+                                    i, j, lookup_table
+                                )
+                                val = cocycle[flat_index]
+                                res[i,j] = val
+                                res[j,i] = -val
+
+            _get_res(cocycle, dist_mat, threshold, lookup_table, n_points, res)
+        
+            return res
+
+        nu = one_cocycle_to_tensor(nu_, self.dist_land_land_, rips_threshold, self.cns_lookup_table_)
+
+        eta = two_cocycle_to_tensor(harmonic_representative,self.dist_land_land_, rips_threshold, self.cns_lookup_table_)
+
         class_map0 = np.zeros_like(varphi.T)
 
         n_data = self.X_.shape[0]
         for b in range(n_data):
             for i in range(self.n_landmarks_):
-                ordered_ij, sign_ordering_ij = CohomologyUtils.order_simplex(
-                    np.array([i, ball_indx[b]])
-                )
-                index_ij = combinatorial_number_system_d1_forward(
-                    ordered_ij[0], ordered_ij[1], self.cns_lookup_table_
-                )
-                if (
-                    self.dist_land_land_[i, ball_indx[b]] < rips_threshold
-                    and i != ball_indx[b]
-                ):
-                    class_map0[b, i] += sign_ordering_ij * integral[index_ij]
-
+                class_map0[b,i] += nu[i, ball_indx[b]]
                 for t in range(self.n_landmarks_):
-                    ordered_ijt, sign_ordering_ijt = CohomologyUtils.order_simplex(
-                        np.array([i, ball_indx[b],t])
-                    )
-                    index_ijt = combinatorial_number_system_d2_forward(
-                        ordered_ijt[0], ordered_ijt[1], ordered_ijt[2], self.cns_lookup_table_
-                    )
-                    if (
-                        self.dist_land_land_[i, ball_indx[b]] < rips_threshold
-                        and self.dist_land_land_[i, t] < rips_threshold
-                        and self.dist_land_land_[ball_indx[b], t] < rips_threshold
-                        and i != ball_indx[b]
-                        and i != t
-                        and ball_indx[b] != t
-                    ):
-                        class_map0[b, i] += varphi[t, b] * sign_ordering_ijt * harmonic_representative[index_ijt]
+                    class_map0[b,i] += varphi[t,b] * eta[i, ball_indx[b], t]
 
-        class_map = np.exp(2 * np.pi * 1j * class_map0) * np.sqrt(varphi.T)
+        class_map = np.exp( 2*np.pi*1j* class_map0 ) * np.sqrt(varphi.T)
+
 
         X = class_map.T
         # variance = np.zeros(X.shape[0])
         # dimension of projective space to project onto
         proj_dim = 1
 
-        for i in range(class_map.shape[1] - proj_dim - 1):
+        for i in range(class_map.shape[1]-proj_dim-1):
             UU, S, _ = np.linalg.svd(X)
             # variance[-i] = np.mean(
             #    (np.pi/2 - np.arccos(np.abs(UU[:,-1].T @ X)))**2
