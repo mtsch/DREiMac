@@ -46,6 +46,7 @@ class ComplexProjectiveCoords(EMCoords):
         self,
         perc=0.99,
         cohomology_class=0,
+        standard_range=True,
         partunity_fn=PartUnity.linear,
         check_and_fix_cocycle_condition=True,
     ):
@@ -104,8 +105,6 @@ class ComplexProjectiveCoords(EMCoords):
         else:
             homological_dimension = 2
             cohomdeath_rips, cohombirth_rips, cocycle = self.get_representative_cocycle(cohomology_class,homological_dimension)
-
-        standard_range = False
 
         ##### determine radius for balls
         r_cover, rips_threshold = EMCoords.get_cover_radius(
