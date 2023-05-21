@@ -48,7 +48,6 @@ class ComplexProjectiveCoords(EMCoords):
         standard_range=True,
         partunity_fn=PartUnity.linear,
         check_and_fix_cocycle_condition=True,
-        HARDCODE=True,
     ):
         """
 
@@ -69,40 +68,10 @@ class ComplexProjectiveCoords(EMCoords):
             TODO
         """
 
-        if HARDCODE:
-            # TODO: generalize
-            data = self.X_
-            landmarks = np.array(
-                [
-                    [0, 0, 1],
-                    [2 * np.sqrt(2) / 3, 0, -1 / 3],
-                    [-np.sqrt(2) / 3, np.sqrt(2 / 3), -1 / 3],
-                    [-np.sqrt(2) / 3, -np.sqrt(2 / 3), -1 / 3],
-                ]
-            )
-            n_landmarks = len(landmarks)
-            self.n_landmarks_ = n_landmarks
-
-            # NOTE: taking minimum between numbers and 1 because
-            # when number is slighlty larger than 1 get nan with arccos
-            dist_land_land = np.arccos(np.minimum(landmarks @ landmarks.T, 1))
-            dist_land_data = np.arccos(np.minimum(landmarks @ data.T, 1))
-
-            self.dist_land_data_ = dist_land_data
-            self.dist_land_land_ = dist_land_land
-
-            # get representative cocycle
-            # TODO: generalize
-            cohomdeath_rips, cohombirth_rips, cocycle = (
-                1.92,
-                4,
-                np.array([[0, 1, 2, 1], [0, 1, 3, 0], [0, 2, 3, 0], [1, 2, 3, 0]]),
-            )
-        else:
-            homological_dimension = 2
-            cohomdeath_rips, cohombirth_rips, cocycle = self.get_representative_cocycle(
-                cohomology_class, homological_dimension
-            )
+        homological_dimension = 2
+        cohomdeath_rips, cohombirth_rips, cocycle = self.get_representative_cocycle(
+            cohomology_class, homological_dimension
+        )
 
         # determine radius for balls
         r_cover, rips_threshold = EMCoords.get_cover_radius(
