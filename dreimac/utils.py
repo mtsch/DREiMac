@@ -1135,3 +1135,21 @@ class ProjectiveMapUtils:
             2*(np.prod(Y[[1,2],:],axis=0) - np.prod(Y[[0,3],:],axis=0)),
             np.sum(Y[[0,1],:]**2,axis=0) - np.sum(Y[[2,3],:]**2,axis=0)
         ]).T
+
+    @staticmethod
+    def stereographic_projection_hemispheres(X):
+        """
+        TODO
+        """
+        def _stereo(v):
+            return v[:,:-1] / (1 - v[:,-1])[:,None]
+        n = X.shape[1]
+        e1 = np.zeros((n-1))
+        e1[0] = 1
+        res = np.zeros((X.shape[0],n-1))
+        res[X[:,-1]<0,:] = _stereo(X[X[:,-1]<0,:])
+        Y = X[X[:,-1]>=0,:]
+        Y[:,-1] *= -1
+        res[X[:,-1]>=0,:] = _stereo(Y) + 2.5*e1
+        return res
+
