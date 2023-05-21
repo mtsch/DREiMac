@@ -1121,3 +1121,17 @@ class ProjectiveMapUtils:
         u[0:2] = x
         u[2] = np.sqrt(1 - magSqr)
         return x, u
+
+    @staticmethod
+    def hopf_map(X):
+        """
+        TODO
+        """
+        Y = np.zeros((2 *X.shape[1], X.shape[0]))
+        Y[::2,:] = np.real(X).T
+        Y[1::2,:] = np.imag(X).T
+        return np.array([
+            2*(np.prod(Y[[0,2],:],axis=0) + np.prod(Y[[1,3],:],axis=0)),
+            2*(np.prod(Y[[1,2],:],axis=0) - np.prod(Y[[0,3],:],axis=0)),
+            np.sum(Y[[0,1],:]**2,axis=0) - np.sum(Y[[2,3],:]**2,axis=0)
+        ]).T

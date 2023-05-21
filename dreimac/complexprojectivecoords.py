@@ -49,6 +49,7 @@ class ComplexProjectiveCoords(EMCoords):
         standard_range=True,
         partunity_fn=PartUnity.linear,
         check_and_fix_cocycle_condition=True,
+        HARDCODE = True
     ):
         """
 
@@ -70,8 +71,6 @@ class ComplexProjectiveCoords(EMCoords):
         thetas: ndarray(n, N)
             TODO
         """
-
-        HARDCODE = False
 
         if HARDCODE:
             # TODO: generalize
@@ -237,8 +236,6 @@ class ComplexProjectiveCoords(EMCoords):
             Y = Y[:-1, :]
             X = np.divide(Y, np.sqrt(1 - np.abs(y) ** 2))
 
-        coords = np.zeros((X.shape[1], 2 * X.shape[0]))
-        coords[:, ::2] = np.real(X).T
-        coords[:, 1::2] = np.imag(X).T
+        coords = X.T
 
         return coords
