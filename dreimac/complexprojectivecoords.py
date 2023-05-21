@@ -14,8 +14,6 @@ from .combinatorial import (
 )
 
 
-
-
 class ComplexProjectiveCoords(EMCoords):
     def __init__(
         self, X, n_landmarks, distance_matrix=False, prime=41, maxdim=2, verbose=False
@@ -46,11 +44,11 @@ class ComplexProjectiveCoords(EMCoords):
         self,
         perc=0.99,
         cohomology_class=0,
-        proj_dim = 1,
+        proj_dim=1,
         standard_range=True,
         partunity_fn=PartUnity.linear,
         check_and_fix_cocycle_condition=True,
-        HARDCODE = True
+        HARDCODE=True,
     ):
         """
 
@@ -102,9 +100,11 @@ class ComplexProjectiveCoords(EMCoords):
             )
         else:
             homological_dimension = 2
-            cohomdeath_rips, cohombirth_rips, cocycle = self.get_representative_cocycle(cohomology_class,homological_dimension)
+            cohomdeath_rips, cohombirth_rips, cocycle = self.get_representative_cocycle(
+                cohomology_class, homological_dimension
+            )
 
-        ##### determine radius for balls
+        # determine radius for balls
         r_cover, rips_threshold = EMCoords.get_cover_radius(
             self, perc, cohomdeath_rips, cohombirth_rips, standard_range
         )
@@ -126,20 +126,25 @@ class ComplexProjectiveCoords(EMCoords):
         )
 
         # integrate cocycle
-        nu_ = lsqr(delta1, integer_cocycle_as_vector)[0]
-        harmonic_representative = integer_cocycle_as_vector - delta1 @ nu_
+        integral = lsqr(delta1, integer_cocycle_as_vector)[0]
+        harmonic_representative = integer_cocycle_as_vector - delta1 @ integral
 
-        #turn cocycle into tensor
-        def two_cocycle_to_tensor(cocycle:np.ndarray, dist_mat: np.ndarray, threshold: float, lookup_table: np.ndarray):
+        # turn cocycle into tensor
+        def two_cocycle_to_tensor(
+            cocycle: np.ndarray,
+            dist_mat: np.ndarray,
+            threshold: float,
+            lookup_table: np.ndarray,
+        ):
             n_points = dist_mat.shape[0]
             n_edges = (n_points * (n_points - 1)) // 2
             n_faces = number_of_simplices_of_dimension(2, n_points, lookup_table)
 
-            res = np.zeros((n_points,n_points,n_points))
+            res = np.zeros((n_points, n_points, n_points))
 
-            #@jit(fastmath=True)
+            # @jit(fastmath=True)
             def _get_res(
-                cocycle:np.ndarray, 
+                cocycle: np.ndarray,
                 dist_mat: np.ndarray,
                 threshold: float,
                 lookup_table: np.ndarray,
@@ -158,32 +163,37 @@ class ComplexProjectiveCoords(EMCoords):
                                         i, j, k, lookup_table
                                     )
                                     val = cocycle[flat_index]
-                                    #012
-                                    res[i,j,k] = val
-                                    #021
-                                    res[i,k,j] = -val
-                                    #102
-                                    res[j,i,k] = -val
-                                    #210
-                                    res[k,j,i] = -val
-                                    #201
-                                    res[k,i,j] = val
-                                    #120
-                                    res[j,k,i] = val
+                                    # 012
+                                    res[i, j, k] = val
+                                    # 021
+                                    res[i, k, j] = -val
+                                    # 102
+                                    res[j, i, k] = -val
+                                    # 210
+                                    res[k, j, i] = -val
+                                    # 201
+                                    res[k, i, j] = val
+                                    # 120
+                                    res[j, k, i] = val
 
             _get_res(cocycle, dist_mat, threshold, lookup_table, n_points, res)
-        
+
             return res
 
-        def one_cocycle_to_tensor(cocycle:np.ndarray, dist_mat: np.ndarray, threshold: float, lookup_table: np.ndarray):
+        def one_cocycle_to_tensor(
+            cocycle: np.ndarray,
+            dist_mat: np.ndarray,
+            threshold: float,
+            lookup_table: np.ndarray,
+        ):
             n_points = dist_mat.shape[0]
             n_edges = (n_points * (n_points - 1)) // 2
 
-            res = np.zeros((n_points,n_points))
+            res = np.zeros((n_points, n_points))
 
-            #@jit(fastmath=True)
+            # @jit(fastmath=True)
             def _get_res(
-                cocycle:np.ndarray, 
+                cocycle: np.ndarray,
                 dist_mat: np.ndarray,
                 threshold: float,
                 lookup_table: np.ndarray,
@@ -193,31 +203,49 @@ class ComplexProjectiveCoords(EMCoords):
                 for i in range(n_points):
                     for j in range(i + 1, n_points):
                         if dist_mat[i, j] < threshold:
-                                flat_index = combinatorial_number_system_d1_forward(
-                                    i, j, lookup_table
-                                )
-                                val = cocycle[flat_index]
-                                res[i,j] = val
-                                res[j,i] = -val
+                            flat_index = combinatorial_number_system_d1_forward(
+                                i, j, lookup_table
+                            )
+                            val = cocycle[flat_index]
+                            res[i, j] = val
+                            res[j, i] = -val
 
             _get_res(cocycle, dist_mat, threshold, lookup_table, n_points, res)
-        
+
             return res
 
-        nu = one_cocycle_to_tensor(nu_, self.dist_land_land_, rips_threshold, self.cns_lookup_table_)
+        nu = one_cocycle_to_tensor(
+            integral, self.dist_land_land_, rips_threshold, self.cns_lookup_table_
+        )
 
-        eta = two_cocycle_to_tensor(harmonic_representative,self.dist_land_land_, rips_threshold, self.cns_lookup_table_)
+        eta = two_cocycle_to_tensor(
+            harmonic_representative,
+            self.dist_land_land_,
+            rips_threshold,
+            self.cns_lookup_table_,
+        )
 
         class_map0 = np.zeros_like(varphi.T)
 
-        n_data = self.X_.shape[0]
-        for b in range(n_data):
-            for i in range(self.n_landmarks_):
-                class_map0[b,i] += nu[i, ball_indx[b]]
-                for t in range(self.n_landmarks_):
-                    class_map0[b,i] += varphi[t,b] * eta[i, ball_indx[b], t]
+        @jit
+        def _assemble(
+            class_map: np.ndarray,
+            nu: np.ndarray,
+            eta: np.ndarray,
+            varphi: np.ndarray,
+            n_landmarks: int,
+            n_data: int,
+            ball_indx: np.ndarray,
+        ):
+            for b in range(n_data):
+                for i in range(n_landmarks):
+                    class_map[b, i] += nu[i, ball_indx[b]]
+                    for t in range(n_landmarks):
+                        class_map[b, i] += varphi[t, b] * eta[i, ball_indx[b], t]
+            return np.exp(2 * np.pi * 1j * class_map0) * np.sqrt(varphi.T)
 
-        class_map = np.exp( 2*np.pi*1j* class_map0 ) * np.sqrt(varphi.T)
+        class_map = _assemble(class_map0, nu, eta, varphi, self.n_landmarks_, self.X_.shape[0], ball_indx)
+
 
         epca = EquivariantPCA.ppca(class_map, proj_dim, self.verbose)
         self.variance_ = epca["variance"]

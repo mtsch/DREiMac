@@ -531,6 +531,7 @@ class PartUnity:
 
 class EquivariantPCA:
 
+    @staticmethod
     def ppca(class_map, proj_dim, verbose=False):
         """
         Principal Projective Component Analysis (Jose Perea 2017)

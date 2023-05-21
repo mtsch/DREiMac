@@ -89,7 +89,6 @@ class ProjectiveCoords(EMCoords):
 
         varphi, ball_indx = EMCoords.get_covering_partition(self, r_cover, partunity_fn)
 
-        # compute all transition functions
         cocycle_matrix = np.ones((n_landmarks, n_landmarks))
         cocycle_matrix[cocycle[:, 0], cocycle[:, 1]] = -1
         cocycle_matrix[cocycle[:, 1], cocycle[:, 0]] = -1
