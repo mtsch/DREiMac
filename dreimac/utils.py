@@ -1103,7 +1103,7 @@ class ProjectiveMapUtils:
         n = X.shape[1]
         if center_vector is None:
             center_vector = np.zeros((n))
-            center_vector[0] = 1
+            center_vector[-1] = 1
         centering_rotation = ProjectiveMapUtils.rotmat(center_vector)
         X_ = X @ centering_rotation.T
         e1 = np.zeros((n-1))
