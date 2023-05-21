@@ -1036,57 +1036,14 @@ class ProjectiveMapUtils:
             The stereographically projected coordinates
 
         """
-        def _rotmat(a, b=np.array([])):
-            """
-            Construct a d x d rotation matrix that rotates
-            a vector a so that it coincides with a vector b
 
-            Parameters
-            ----------
-            a : ndarray (d)
-                A d-dimensional vector that should be rotated to b
-            b : ndarray(d)
-                A d-dimensional vector that shoudl end up residing at
-                the north pole (0,0,...,0,1)
-
-            """
-            if (len(a.shape) > 1 and np.min(a.shape) > 1) or (
-                len(b.shape) > 1 and np.min(b.shape) > 1
-            ):
-                print("Error: a and b need to be 1D vectors")
-                return None
-            a = a.flatten()
-            a = a / np.sqrt(np.sum(a**2))
-            d = a.size
-
-            if b.size == 0:
-                b = np.zeros(d)
-                b[-1] = 1
-            b = b / np.sqrt(np.sum(b**2))
-
-            c = a - np.sum(b * a) * b
-            # If a numerically coincides with b, don't rotate at all
-            if np.sqrt(np.sum(c**2)) < 1e-15:
-                return np.eye(d)
-
-            # Otherwise, compute rotation matrix
-            c = c / np.sqrt(np.sum(c**2))
-            lam = np.sum(b * a)
-            beta = np.sqrt(1 - np.abs(lam) ** 2)
-            rot = (
-                np.eye(d)
-                - (1 - lam) * (c[:, None].dot(c[None, :]))
-                - (1 - lam) * (b[:, None].dot(b[None, :]))
-                + beta * (b[:, None].dot(c[None, :]) - c[:, None].dot(b[None, :]))
-            )
-            return rot
 
         X = pX.T
         # Put points all on the same hemisphere
         if u.size == 0:
             _, U = np.linalg.eigh(X.dot(X.T))
             u = U[:, 0]
-        XX = _rotmat(u).dot(X)
+        XX = ProjectiveMapUtils.rotmat(u).dot(X)
         ind = XX[-1, :] < 0
         XX[:, ind] *= -1
         # Do stereographic projection
@@ -1137,19 +1094,69 @@ class ProjectiveMapUtils:
         ]).T
 
     @staticmethod
-    def stereographic_projection_hemispheres(X):
+    def stereographic_projection_hemispheres(X,center_vector=None):
         """
         TODO
         """
         def _stereo(v):
             return v[:,:-1] / (1 - v[:,-1])[:,None]
         n = X.shape[1]
+        if center_vector is None:
+            center_vector = np.zeros((n))
+            center_vector[0] = 1
+        centering_rotation = ProjectiveMapUtils.rotmat(center_vector)
+        X_ = X @ centering_rotation.T
         e1 = np.zeros((n-1))
         e1[0] = 1
-        res = np.zeros((X.shape[0],n-1))
-        res[X[:,-1]<0,:] = _stereo(X[X[:,-1]<0,:])
-        Y = X[X[:,-1]>=0,:]
+        res = np.zeros((X_.shape[0],n-1))
+        res[X_[:,-1]<0,:] = _stereo(X_[X_[:,-1]<0,:])
+        Y = X_[X_[:,-1]>=0,:]
         Y[:,-1] *= -1
-        res[X[:,-1]>=0,:] = _stereo(Y) + 2.5*e1
+        res[X_[:,-1]>=0,:] = _stereo(Y) + 2.5*e1
         return res
 
+    @staticmethod
+    def rotmat(a, b=np.array([])):
+        """
+        Construct a d x d rotation matrix that rotates
+        a vector a so that it coincides with a vector b
+
+        Parameters
+        ----------
+        a : ndarray (d)
+            A d-dimensional vector that should be rotated to b
+        b : ndarray(d)
+            A d-dimensional vector that should end up residing at
+            the north pole (0,0,...,0,1)
+
+        """
+        if (len(a.shape) > 1 and np.min(a.shape) > 1) or (
+            len(b.shape) > 1 and np.min(b.shape) > 1
+        ):
+            print("Error: a and b need to be 1D vectors")
+            return None
+        a = a.flatten()
+        a = a / np.sqrt(np.sum(a**2))
+        d = a.size
+
+        if b.size == 0:
+            b = np.zeros(d)
+            b[-1] = 1
+        b = b / np.sqrt(np.sum(b**2))
+
+        c = a - np.sum(b * a) * b
+        # If a numerically coincides with b, don't rotate at all
+        if np.sqrt(np.sum(c**2)) < 1e-15:
+            return np.eye(d)
+
+        # Otherwise, compute rotation matrix
+        c = c / np.sqrt(np.sum(c**2))
+        lam = np.sum(b * a)
+        beta = np.sqrt(1 - np.abs(lam) ** 2)
+        rot = (
+            np.eye(d)
+            - (1 - lam) * (c[:, None].dot(c[None, :]))
+            - (1 - lam) * (b[:, None].dot(b[None, :]))
+            + beta * (b[:, None].dot(c[None, :]) - c[:, None].dot(b[None, :]))
+        )
+        return rot
