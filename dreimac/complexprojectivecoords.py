@@ -3,7 +3,7 @@ from numba import jit
 import scipy.sparse as sparse
 from scipy.sparse.linalg import lsqr
 from scipy.optimize import LinearConstraint, milp, linprog
-from .utils import PartUnity, CircleMapUtils, CohomologyUtils
+from .utils import PartUnity, CohomologyUtils, EquivariantPCA
 from .emcoords import EMCoords
 from .combinatorial import (
     combinatorial_number_system_table,
@@ -46,6 +46,7 @@ class ComplexProjectiveCoords(EMCoords):
         self,
         perc=0.99,
         cohomology_class=0,
+        proj_dim = 1,
         standard_range=True,
         partunity_fn=PartUnity.linear,
         check_and_fix_cocycle_condition=True,
@@ -59,8 +60,6 @@ class ComplexProjectiveCoords(EMCoords):
         ----------
         perc : float
             Percent coverage
-        inner_product : string
-            Either 'uniform' or 'exponential'
         cohomology_class : integer
             TODO: explain
         partunity_fn: (dist_land_data, r_cover) -> phi
@@ -220,22 +219,7 @@ class ComplexProjectiveCoords(EMCoords):
 
         class_map = np.exp( 2*np.pi*1j* class_map0 ) * np.sqrt(varphi.T)
 
+        epca = EquivariantPCA.ppca(class_map, proj_dim, self.verbose)
+        self.variance_ = epca["variance"]
 
-        X = class_map.T
-        # variance = np.zeros(X.shape[0])
-        # dimension of projective space to project onto
-        proj_dim = 1
-
-        for i in range(class_map.shape[1]-proj_dim-1):
-            UU, S, _ = np.linalg.svd(X)
-            # variance[-i] = np.mean(
-            #    (np.pi/2 - np.arccos(np.abs(UU[:,-1].T @ X)))**2
-            # )
-            Y = np.conjugate(UU.T) @ X
-            y = Y[-1, :]
-            Y = Y[:-1, :]
-            X = np.divide(Y, np.sqrt(1 - np.abs(y) ** 2))
-
-        coords = X.T
-
-        return coords
+        return epca["X"]
