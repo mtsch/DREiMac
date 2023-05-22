@@ -457,6 +457,99 @@ class CohomologyUtils:
             shape=(n_actual_faces, n_edges),
         )
 
+    @staticmethod
+    def make_delta2_compact(
+        dist_mat: np.ndarray, threshold: float, lookup_table: np.ndarray
+    ):
+        """
+        Like [make_delta1_compact] but for delta2.
+        """
+        n_points = dist_mat.shape[0]
+        n_faces = number_of_simplices_of_dimension(2, n_points, lookup_table)
+        n_three_simplices = number_of_simplices_of_dimension(3, n_points, lookup_table)
+
+        max_n_entries = 4 * n_three_simplices
+        rows = np.empty((max_n_entries,), dtype=int)
+        columns = np.empty((max_n_entries,), dtype=int)
+        values = np.empty((max_n_entries,), dtype=float)
+
+        @jit(fastmath=True)
+        def _delta2_get_row_columns_values(
+            dist_mat: np.ndarray,
+            threshold: float,
+            lookup_table: np.ndarray,
+            n_points: int,
+            rows: np.ndarray,
+            columns: np.ndarray,
+            values: np.ndarray,
+        ):
+            n_entries = 0
+            n_actual_three_simplices = 0
+            for i in range(n_points):
+                for j in range(i + 1, n_points):
+                    if dist_mat[i, j] < threshold:
+                        for k in range(j + 1, n_points):
+                            if (
+                                dist_mat[i, k] < threshold
+                                and dist_mat[j, k] < threshold
+                            ):
+                                for l in range(k+1, n_points):
+                                    if (
+                                        dist_mat[i, l] < threshold
+                                        and dist_mat[j, l] < threshold
+                                        and dist_mat[k, l] < threshold
+                                    ):
+                                        row_index = n_actual_three_simplices
+
+                                        column_index_ijk = combinatorial_number_system_d2_forward(
+                                            i, j, k, lookup_table
+                                        )
+                                        column_index_ijl = combinatorial_number_system_d2_forward(
+                                            i, j, l, lookup_table
+                                        )
+                                        column_index_ikl = combinatorial_number_system_d2_forward(
+                                            i, k, l, lookup_table
+                                        )
+                                        column_index_jkl = combinatorial_number_system_d2_forward(
+                                            j, k, l, lookup_table
+                                        )
+
+                                        rows[n_entries] = row_index
+                                        columns[n_entries] = column_index_ijk
+                                        values[n_entries] = 1
+                                        n_entries += 1
+
+                                        rows[n_entries] = row_index
+                                        columns[n_entries] = column_index_ijl
+                                        values[n_entries] = -1
+                                        n_entries += 1
+
+                                        rows[n_entries] = row_index
+                                        columns[n_entries] = column_index_ikl
+                                        values[n_entries] = 1
+                                        n_entries += 1
+
+                                        rows[n_entries] = row_index
+                                        columns[n_entries] = column_index_jkl
+                                        values[n_entries] = -1
+                                        n_entries += 1
+
+                                        n_actual_three_simplices += 1
+            return n_entries, n_actual_three_simplices
+
+        n_entries, n_actual_three_simplices = _delta2_get_row_columns_values(
+            dist_mat, threshold, lookup_table, n_points, rows, columns, values
+        )
+
+        # print("delta 1")
+        # print(n_entries)
+        # print(max_n_entries)
+
+        return sparse.csr_array(
+            (values[:n_entries], (rows[:n_entries], columns[:n_entries])),
+            shape=(n_actual_three_simplices, n_faces),
+        )
+
 
 class PartUnity:
     """
