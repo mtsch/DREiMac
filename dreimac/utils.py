@@ -732,6 +732,31 @@ class GeometryExamples:
         return P
 
     @staticmethod
+    def moving_dot(sqrt_num_images):
+        """
+        TODO
+        """
+        def _gkern(l=5, mu=0, sig=1.):
+            ax = np.linspace(-(l - 1) / 2., (l - 1) / 2., l)
+            gauss_x = np.exp(-0.5 * np.square(ax - mu[0]) / np.square(sig))
+            gauss_y = np.exp(-0.5 * np.square(ax - mu[1]) / np.square(sig))
+            kernel = np.outer(gauss_x, gauss_y)
+            return kernel
+
+        img_len = 10
+        P = np.zeros((sqrt_num_images**2,img_len*img_len))
+        bound = 15
+        xs = bound * np.power(np.linspace(-1,1,sqrt_num_images), 3)
+        ys = -xs
+        i = 0
+        for x in xs:
+            for y in ys:
+                P[i] = _gkern(l=img_len, mu=np.array([x,y]), sig=3).flatten()
+                i+=1
+        return P
+
+
+    @staticmethod
     def rp2_metric(n_samples, seed=None):
         """
         Return a distance matrix of points on the projective plane
