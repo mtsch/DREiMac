@@ -54,11 +54,12 @@ class EMCoords(object):
         self.dist_land_land_ = self.dist_land_data_[:, self.idx_land_]
         self.cocycles_ = res["cocycles"]
         # Sort persistence diagrams in descending order of persistence
-        idxs = np.argsort(self.dgms_[1][:, 0] - self.dgms_[1][:, 1])
-        self.dgms_[1] = self.dgms_[1][idxs, :]
-        self.dgm1_lifetime = np.array(self.dgms_[1])
-        self.dgm1_lifetime[:, 1] -= self.dgm1_lifetime[:, 0]
-        self.cocycles_[1] = [self.cocycles_[1][idx] for idx in idxs]
+        for i in range(1, maxdim+1):
+            idxs = np.argsort(self.dgms_[i][:, 0] - self.dgms_[i][:, 1])
+            self.dgms_[i] = self.dgms_[i][idxs, :]
+            dgm_lifetime = np.array(self.dgms_[i])
+            dgm_lifetime[:, 1] -= dgm_lifetime[:, 0]
+            self.cocycles_[i] = [self.cocycles_[i][idx] for idx in idxs]
         CohomologyUtils.reindex_cocycles(self.cocycles_, self.idx_land_, X.shape[0])
 
         self.n_landmarks_ = n_landmarks

@@ -493,7 +493,7 @@ class CohomologyUtils:
                                 dist_mat[i, k] < threshold
                                 and dist_mat[j, k] < threshold
                             ):
-                                for l in range(k+1, n_points):
+                                for l in range(k + 1, n_points):
                                     if (
                                         dist_mat[i, l] < threshold
                                         and dist_mat[j, l] < threshold
@@ -501,17 +501,25 @@ class CohomologyUtils:
                                     ):
                                         row_index = n_actual_three_simplices
 
-                                        column_index_ijk = combinatorial_number_system_d2_forward(
-                                            i, j, k, lookup_table
+                                        column_index_ijk = (
+                                            combinatorial_number_system_d2_forward(
+                                                i, j, k, lookup_table
+                                            )
                                         )
-                                        column_index_ijl = combinatorial_number_system_d2_forward(
-                                            i, j, l, lookup_table
+                                        column_index_ijl = (
+                                            combinatorial_number_system_d2_forward(
+                                                i, j, l, lookup_table
+                                            )
                                         )
-                                        column_index_ikl = combinatorial_number_system_d2_forward(
-                                            i, k, l, lookup_table
+                                        column_index_ikl = (
+                                            combinatorial_number_system_d2_forward(
+                                                i, k, l, lookup_table
+                                            )
                                         )
-                                        column_index_jkl = combinatorial_number_system_d2_forward(
-                                            j, k, l, lookup_table
+                                        column_index_jkl = (
+                                            combinatorial_number_system_d2_forward(
+                                                j, k, l, lookup_table
+                                            )
                                         )
 
                                         rows[n_entries] = row_index
@@ -623,7 +631,6 @@ class PartUnity:
 
 
 class EquivariantPCA:
-
     @staticmethod
     def ppca(class_map, proj_dim, verbose=False):
         """
@@ -654,32 +661,62 @@ class EquivariantPCA:
                 % (class_map.shape[0], class_map.shape[1], proj_dim)
             )
 
-
         X = class_map.T
         variance = np.zeros(X.shape[0] - 1)
         n_dim = class_map.shape[1]
 
-        tic = time.time()
-        # Projective dimensionality reduction : Main Loop
-        XRet = None
-        for i in range(n_dim - 1):
-            # Project onto an "equator"
+        def _one_step_linear_reduction(X, dims_to_keep):
             try:
                 _, U = np.linalg.eigh(X.dot(np.conjugate(X).T))
                 U = np.fliplr(U)
             except:
                 U = np.eye(X.shape[0])
-            variance[-i - 1] = np.mean(
-                (np.pi / 2 - np.real(np.arccos(np.abs(U[:, -1][None, :].dot(X))))) ** 2
-            )
             Y = (np.conjugate(U).T).dot(X)
-            y = np.array(Y[-1, :])
-            Y = Y[0:-1, :]
-            X = Y / np.sqrt(1 - np.abs(y) ** 2)[None, :]
-            if i == n_dim - proj_dim - 2:
-                XRet = np.array(X)
-        if verbose:
-            print("Elapsed time ppca: %.3g" % (time.time() - tic))
+            Y = Y[:dims_to_keep, :]
+            X = Y / np.linalg.norm(Y, axis=0)[None, :]
+            return X
+
+        total_dims_to_keep = proj_dim + 1
+
+        modes = ["direct", "exponential", "one-by-one"]
+        mode = "one-by-one"
+        if mode == "direct":
+            XRet = _one_step_linear_reduction(X, total_dims_to_keep)
+        elif mode == "exponential":
+            to_keep_this_iter = (n_dim - total_dims_to_keep) // 2
+            while to_keep_this_iter > 0:
+                X = _one_step_linear_reduction(
+                    X, total_dims_to_keep + to_keep_this_iter
+                )
+                to_keep_this_iter = to_keep_this_iter // 2
+            if X.shape[0] > total_dims_to_keep:
+                X = _one_step_linear_reduction(X, total_dims_to_keep)
+            XRet = X
+
+        elif mode == "one-by-one":
+            tic = time.time()
+            # Projective dimensionality reduction : Main Loop
+            XRet = None
+            for i in range(n_dim - 1):
+                if i == n_dim - proj_dim - 1:
+                    XRet = X
+                try:
+                    _, U = np.linalg.eigh(X.dot(np.conjugate(X).T))
+                    U = np.fliplr(U)
+                    # U, _, _ = np.linalg.svd(X)
+                except:
+                    U = np.eye(X.shape[0])
+                variance[-i - 1] = np.mean(
+                    (np.pi / 2 - np.real(np.arccos(np.abs(U[:, -1][None, :].dot(X)))))
+                    ** 2
+                )
+                Y = (np.conjugate(U).T).dot(X)
+                # y = np.array(Y[-1, :])
+                Y = Y[0:-1, :]
+                # X = Y / np.sqrt(1 - np.abs(y) ** 2)[None, :]
+                X = Y / np.linalg.norm(Y, axis=0)[None, :]
+            if verbose:
+                print("Elapsed time ppca: %.3g" % (time.time() - tic))
 
         # Return the variance and the projective coordinates
         return {"variance": variance, "X": XRet.T}
@@ -690,6 +727,7 @@ class GeometryExamples:
     Finite samples from topologically nontrivial spaces.
 
     """
+
     # TODO: These probably belong in tdasets, but I'll keep them here for now
 
     @staticmethod
@@ -732,29 +770,30 @@ class GeometryExamples:
         return P
 
     @staticmethod
-    def moving_dot(sqrt_num_images):
+    def moving_dot(sqrt_num_images, sigma=3):
         """
         TODO
         """
-        def _gkern(l=5, mu=0, sig=1.):
-            ax = np.linspace(-(l - 1) / 2., (l - 1) / 2., l)
+
+        def _gkern(l=5, mu=0, sig=1.0):
+            ax = np.linspace(-(l - 1) / 2.0, (l - 1) / 2.0, l)
             gauss_x = np.exp(-0.5 * np.square(ax - mu[0]) / np.square(sig))
             gauss_y = np.exp(-0.5 * np.square(ax - mu[1]) / np.square(sig))
             kernel = np.outer(gauss_x, gauss_y)
             return kernel
 
         img_len = 10
-        P = np.zeros((sqrt_num_images**2,img_len*img_len))
+        P = np.zeros((sqrt_num_images**2, img_len * img_len))
         bound = 15
-        xs = bound * np.power(np.linspace(-1,1,sqrt_num_images), 3)
+        xs = bound * np.power(np.linspace(-1, 1, sqrt_num_images), 3)
+        # xs = bound * np.linspace(-1,1,sqrt_num_images)
         ys = -xs
         i = 0
         for x in xs:
             for y in ys:
-                P[i] = _gkern(l=img_len, mu=np.array([x,y]), sig=3).flatten()
-                i+=1
+                P[i] = _gkern(l=img_len, mu=np.array([x, y]), sig=sigma).flatten()
+                i += 1
         return P
-
 
     @staticmethod
     def rp2_metric(n_samples, seed=None):
@@ -1054,9 +1093,9 @@ class CircleMapUtils:
             A numpy array of floats to be used as color in a matplotlib scatterplot.
 
         """
-        h = np.mod(circle_map/(2*np.pi) + 0.5, 1)
-        f = lambda x : np.sin(np.pi * x)**2
-        return np.stack([f(3/6-h), f(5/6-h), f(7/6-h)], -1)
+        h = np.mod(circle_map / (2 * np.pi) + 0.5, 1)
+        f = lambda x: np.sin(np.pi * x) ** 2
+        return np.stack([f(3 / 6 - h), f(5 / 6 - h), f(7 / 6 - h)], -1)
 
     @staticmethod
     def center(circle_map):
@@ -1219,7 +1258,6 @@ class ProjectiveMapUtils:
 
         """
 
-
         X = pX.T
         # Put points all on the same hemisphere
         if u.size == 0:
@@ -1231,7 +1269,6 @@ class ProjectiveMapUtils:
         # Do stereographic projection
         S = XX[0:-1, :] / (1 + XX[-1, :])[None, :]
         return S.T
-
 
     @staticmethod
     def circle_to_3dnorthpole(x):
@@ -1266,35 +1303,39 @@ class ProjectiveMapUtils:
         """
         TODO
         """
-        Y = np.zeros((2 *X.shape[1], X.shape[0]))
-        Y[::2,:] = np.real(X).T
-        Y[1::2,:] = np.imag(X).T
-        return np.array([
-            2*(np.prod(Y[[0,2],:],axis=0) + np.prod(Y[[1,3],:],axis=0)),
-            2*(np.prod(Y[[1,2],:],axis=0) - np.prod(Y[[0,3],:],axis=0)),
-            np.sum(Y[[0,1],:]**2,axis=0) - np.sum(Y[[2,3],:]**2,axis=0)
-        ]).T
+        Y = np.zeros((2 * X.shape[1], X.shape[0]))
+        Y[::2, :] = np.real(X).T
+        Y[1::2, :] = np.imag(X).T
+        return np.array(
+            [
+                2 * (np.prod(Y[[0, 2], :], axis=0) + np.prod(Y[[1, 3], :], axis=0)),
+                2 * (np.prod(Y[[1, 2], :], axis=0) - np.prod(Y[[0, 3], :], axis=0)),
+                np.sum(Y[[0, 1], :] ** 2, axis=0) - np.sum(Y[[2, 3], :] ** 2, axis=0),
+            ]
+        ).T
 
     @staticmethod
-    def stereographic_projection_hemispheres(X,center_vector=None):
+    def stereographic_projection_hemispheres(X, center_vector=None):
         """
         TODO
         """
+
         def _stereo(v):
-            return v[:,:-1] / (1 - v[:,-1])[:,None]
+            return v[:, :-1] / (1 - v[:, -1])[:, None]
+
         n = X.shape[1]
         if center_vector is None:
             center_vector = np.zeros((n))
             center_vector[-1] = 1
         centering_rotation = ProjectiveMapUtils.rotmat(center_vector)
         X_ = X @ centering_rotation.T
-        e1 = np.zeros((n-1))
+        e1 = np.zeros((n - 1))
         e1[0] = 1
-        res = np.zeros((X_.shape[0],n-1))
-        res[X_[:,-1]<0,:] = _stereo(X_[X_[:,-1]<0,:])
-        Y = X_[X_[:,-1]>=0,:]
-        Y[:,-1] *= -1
-        res[X_[:,-1]>=0,:] = _stereo(Y) + 2.5*e1
+        res = np.zeros((X_.shape[0], n - 1))
+        res[X_[:, -1] < 0, :] = _stereo(X_[X_[:, -1] < 0, :])
+        Y = X_[X_[:, -1] >= 0, :]
+        Y[:, -1] *= -1
+        res[X_[:, -1] >= 0, :] = _stereo(Y) + 2.5 * e1
         return res
 
     @staticmethod
