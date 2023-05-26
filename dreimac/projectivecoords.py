@@ -1,10 +1,10 @@
 import numpy as np
 import time
 from .utils import PartUnity, EquivariantPCA
-from .emcoords import EMCoords
+from .lenscoords import LensCoords
 
 
-class ProjectiveCoords(EMCoords):
+class ProjectiveCoords(LensCoords):
     """
     Object that performs multiscale real projective coordinates via
     persistent cohomology of sparse filtrations (Jose Perea 2018).
@@ -18,7 +18,7 @@ class ProjectiveCoords(EMCoords):
     distance_matrix: boolean
         If true, treat X as a distance matrix instead of a point cloud
     maxdim : int
-        Maximum dimension of homology. Only dimension 1 is needed for circular coordinates,
+        Maximum dimension of homology. Only dimension 1 is needed for real projective coordinates,
         but it may be of interest to see other dimensions (e.g. for a torus)
     partunity_fn: ndarray(n_landmarks, N) -> ndarray(n_landmarks, N)
         A partition of unity function
@@ -26,19 +26,17 @@ class ProjectiveCoords(EMCoords):
     """
 
     def __init__(self, X, n_landmarks, distance_matrix=False, maxdim=1, verbose=False):
-        EMCoords.__init__(
+        prime = 2
+        LensCoords.__init__(
             self,
             X=X,
             n_landmarks=n_landmarks,
             distance_matrix=distance_matrix,
-            prime=2,
+            prime=prime,
             maxdim=maxdim,
             verbose=verbose,
         )
         self.type_ = "proj"
-        # GUI variables
-        self.selected = set([])
-        self.u = np.array([0, 0, 1])
 
     def get_coordinates(
         self,
@@ -75,28 +73,37 @@ class ProjectiveCoords(EMCoords):
 
         """
 
-        n_landmarks = self.n_landmarks_
-        n_data = self.X_.shape[0]
-
-        homological_dimension = 1
-        cohomdeath_rips, cohombirth_rips, cocycle = self.get_representative_cocycle(
-            cocycle_idx, homological_dimension
+        return LensCoords.get_coordinates(
+            self,
+            perc=perc,
+            cocycle_idx=cocycle_idx,
+            lens_dim=proj_dim,
+            partunity_fn=partunity_fn,
+            standard_range=standard_range,
         )
 
-        r_cover, _ = EMCoords.get_cover_radius(
-            self, perc, cohomdeath_rips, cohombirth_rips, standard_range
-        )
+        # n_landmarks = self.n_landmarks_
+        # n_data = self.X_.shape[0]
 
-        varphi, ball_indx = EMCoords.get_covering_partition(self, r_cover, partunity_fn)
+        # homological_dimension = 1
+        # cohomdeath_rips, cohombirth_rips, cocycle = self.get_representative_cocycle(
+        #    cocycle_idx, homological_dimension
+        # )
 
-        cocycle_matrix = np.ones((n_landmarks, n_landmarks))
-        cocycle_matrix[cocycle[:, 0], cocycle[:, 1]] = -1
-        cocycle_matrix[cocycle[:, 1], cocycle[:, 0]] = -1
-        class_map = np.sqrt(varphi.T)
-        for i in range(n_data):
-            class_map[i, :] *= cocycle_matrix[ball_indx[i], :]
+        # r_cover, _ = EMCoords.get_cover_radius(
+        #    self, perc, cohomdeath_rips, cohombirth_rips, standard_range
+        # )
 
-        epca = EquivariantPCA.ppca(class_map, proj_dim, self.verbose)
-        self.variance_ = epca["variance"]
+        # varphi, ball_indx = EMCoords.get_covering_partition(self, r_cover, partunity_fn)
 
-        return epca["X"]
+        # cocycle_matrix = np.ones((n_landmarks, n_landmarks))
+        # cocycle_matrix[cocycle[:, 0], cocycle[:, 1]] = -1
+        # cocycle_matrix[cocycle[:, 1], cocycle[:, 0]] = -1
+        # class_map = np.sqrt(varphi.T)
+        # for i in range(n_data):
+        #    class_map[i, :] *= cocycle_matrix[ball_indx[i], :]
+
+        # epca = EquivariantPCA.ppca(class_map, proj_dim, self.verbose)
+        # self.variance_ = epca["variance"]
+
+        # return epca["X"]
