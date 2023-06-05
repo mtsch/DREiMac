@@ -1419,3 +1419,30 @@ class ProjectiveMapUtils:
             + beta * (b[:, None].dot(c[None, :]) - c[:, None].dot(b[None, :]))
         )
         return rot
+
+
+class LensMapUtils:
+    # TODO: docstring
+
+    @staticmethod
+    def lens_3D_to_disk_3D(X,q):
+        # TODO: docstring
+        def _point_lens_to_sphere(p,q):
+            p1 = p[0]
+            p2 = p[1]
+            arg_z = np.mod(np.angle(p1), 2 * np.pi)
+            theta = np.mod(arg_z, 2 * np.pi / q)
+
+            k = np.floor((arg_z - theta) / (2 * np.pi / q))
+
+            phi = np.mod(np.angle(p2), 2 * np.pi) - 2 * k * np.pi / q
+
+            r = np.abs(p2)
+            x, y, z = (
+                r * np.cos(phi),
+                r * np.sin(phi),
+                (q / np.pi) * (theta - np.pi / q) * np.sqrt(1 - r**2),
+            )
+            return [x,y,z]
+
+        return np.array([_point_lens_to_sphere(p,q) for p in X])
