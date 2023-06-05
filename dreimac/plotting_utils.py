@@ -102,6 +102,44 @@ class PlotUtils:
         return ax
 
     @staticmethod
+    def plot_sphere_boundary(ax=None):
+        """
+        Plot the boundary of two sphere hemispheres
+
+        Parameters
+        ----------
+        ax : matplotlib axes, optional
+            If given, plot on those axes, otherwise plot
+            on current axes by calling gca()
+
+        """
+
+        second_circle_offset = 2.5
+        ax = ax or plt.gca()
+        t = np.linspace(0, 2 * np.pi, 200)
+        ax.plot(np.cos(t), np.sin(t), "c")
+        ax.plot(np.cos(t) + second_circle_offset, np.sin(t), "c")
+        ax.axis("equal")
+
+        ax.arrow( 0, 0.9, 0, 0.001, head_width=0.15, head_length=0.2, fc="c", ec="c", width=0)
+        ax.arrow( second_circle_offset, 1.1, 0, -0.001, head_width=0.15, head_length=0.2, fc="c", ec="c", width=0)
+
+        ax.arrow( 0, -0.9, 0, -0.001, head_width=0.15, head_length=0.2, fc="c", ec="c", width=0)
+        ax.arrow( second_circle_offset, -1.1, 0, 0.001, head_width=0.15, head_length=0.2, fc="c", ec="c", width=0)
+
+        ax.arrow( 0.9, 0, 0.001, 0, head_width=0.15, head_length=0.2, fc="c", ec="c", width=0)
+        ax.arrow( second_circle_offset+1.1, 0, -0.001,0, head_width=0.15, head_length=0.2, fc="c", ec="c", width=0)
+
+        ax.arrow( -0.9, 0, -0.001, 0, head_width=0.15, head_length=0.2, fc="c", ec="c", width=0)
+        ax.arrow( second_circle_offset-1.1, 0, 0.001,0, head_width=0.15, head_length=0.2, fc="c", ec="c", width=0)
+
+        ax.set_facecolor((0.35, 0.35, 0.35))
+
+        return ax
+
+
+
+    @staticmethod
     def set_axes_equal(ax):
         # taken from https://stackoverflow.com/a/31364297/2171328
         """
