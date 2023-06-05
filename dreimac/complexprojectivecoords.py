@@ -46,6 +46,7 @@ class ComplexProjectiveCoords(EMCoords):
         partunity_fn=PartUnity.linear,
         standard_range=True,
         check_cocycle_condition=True,
+        projective_dim_red_mode="one-by-one",
     ):
         """
         Get complex projective coordinates.
@@ -103,7 +104,6 @@ class ComplexProjectiveCoords(EMCoords):
         )
 
         if check_cocycle_condition:
-
             is_cocycle = _is_two_cocycle(
                 integer_cocycle_as_vector,
                 self.dist_land_land_,
@@ -111,7 +111,9 @@ class ComplexProjectiveCoords(EMCoords):
                 self.cns_lookup_table_,
             )
             if not is_cocycle:
-                delta2 = CohomologyUtils.make_delta2_compact( self.dist_land_land_, rips_threshold, self.cns_lookup_table_)
+                delta2 = CohomologyUtils.make_delta2_compact(
+                    self.dist_land_land_, rips_threshold, self.cns_lookup_table_
+                )
                 d2cocycle = delta2 @ integer_cocycle_as_vector.T
 
                 y = d2cocycle // self.prime_
@@ -140,7 +142,6 @@ class ComplexProjectiveCoords(EMCoords):
                     )
                     integer_cocycle_as_vector = new_cocycle_as_vector
 
-
         # compute harmonic representatives of cocycles and their projective-valued integrals
         integral = lsqr(delta1, integer_cocycle_as_vector)[0]
         harmonic_representative = integer_cocycle_as_vector - delta1 @ integral
@@ -157,7 +158,12 @@ class ComplexProjectiveCoords(EMCoords):
         )
 
         # reduce dimensionality of complex projective space
-        epca = EquivariantPCA.ppca(class_map, proj_dim, self.verbose)
+        epca = EquivariantPCA.ppca(
+            class_map,
+            proj_dim,
+            projective_dim_red_mode,
+            self.verbose,
+        )
         self.variance_ = epca["variance"]
 
         return epca["X"]
@@ -291,6 +297,7 @@ def _sparse_integrate(
         membership_function,
     )
 
+
 @jit(fastmath=True)
 def _is_two_cocycle(
     cochain: np.ndarray,
@@ -304,11 +311,8 @@ def _is_two_cocycle(
         for j in range(i + 1, n_points):
             if dist_mat[i, j] < threshold:
                 for k in range(j + 1, n_points):
-                    if (
-                        dist_mat[i, k] < threshold
-                        and dist_mat[j, k] < threshold
-                    ):
-                        for l in range(k+1, n_points):
+                    if dist_mat[i, k] < threshold and dist_mat[j, k] < threshold:
+                        for l in range(k + 1, n_points):
                             if (
                                 dist_mat[i, l] < threshold
                                 and dist_mat[j, l] < threshold
@@ -336,4 +340,3 @@ def _is_two_cocycle(
                                 ):
                                     is_cocycle = False
     return is_cocycle
-

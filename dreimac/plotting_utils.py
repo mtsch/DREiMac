@@ -30,10 +30,13 @@ class PlotUtils:
         # https://stackoverflow.com/questions/22566284/matplotlib-how-to-plot-images-instead-of-points
 
         ax = ax or plt.gca()
+        min_color = np.min(P)
+        max_color = np.max(P)
         for i in range(P.shape[0]):
             patch = np.reshape(P[i, :], (dim, dim))
             x, y = X[i, :]
             im = OffsetImage(patch, zoom=zoom, cmap="gray")
+            im.get_children()[0].set_clim(vmin=min_color, vmax=max_color)
             ab = AnnotationBbox(im, (x, y), xycoords="data", frameon=False)
             ax.add_artist(ab)
         ax.update_datalim(X)

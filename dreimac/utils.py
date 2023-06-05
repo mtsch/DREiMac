@@ -154,6 +154,13 @@ class GeometryUtils:
         DLandmarks = D[perm, :]
         return {"perm": perm, "lambdas": lambdas, "DLandmarks": DLandmarks}
 
+    @staticmethod
+    def geodesic_distance_estimate(X, n_neighbors):
+        from sklearn.manifold import Isomap
+        embedding = Isomap(n_neighbors=n_neighbors)
+        embedding.fit(X)
+        return embedding.dist_matrix_
+
 
 class CohomologyUtils:
     @staticmethod
@@ -632,7 +639,7 @@ class PartUnity:
 
 class EquivariantPCA:
     @staticmethod
-    def ppca(class_map, proj_dim, verbose=False):
+    def ppca(class_map, proj_dim, projective_dim_red_mode="one-by-one", verbose=False):
         """
         Principal Projective Component Analysis (Jose Perea 2017)
 
@@ -679,7 +686,7 @@ class EquivariantPCA:
         total_dims_to_keep = proj_dim + 1
 
         modes = ["direct", "exponential", "one-by-one"]
-        mode = "one-by-one"
+        mode = projective_dim_red_mode
         if mode == "direct":
             XRet = _one_step_linear_reduction(X, total_dims_to_keep)
         elif mode == "exponential":

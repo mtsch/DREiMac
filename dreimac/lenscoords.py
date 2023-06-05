@@ -26,7 +26,9 @@ class LensCoords(EMCoords):
 
     """
 
-    def __init__(self, X, n_landmarks, distance_matrix=False, prime=3, maxdim=1, verbose=False):
+    def __init__(
+        self, X, n_landmarks, distance_matrix=False, prime=3, maxdim=1, verbose=False
+    ):
         EMCoords.__init__(
             self,
             X=X,
@@ -45,6 +47,7 @@ class LensCoords(EMCoords):
         lens_dim=1,
         partunity_fn=PartUnity.linear,
         standard_range=True,
+        projective_dim_red_mode="one-by-one"
     ):
         """
         Get real projective coordinates.
@@ -71,7 +74,6 @@ class LensCoords(EMCoords):
         """
 
         n_landmarks = self.n_landmarks_
-        n_data = self.X_.shape[0]
 
         homological_dimension = 1
         cohomdeath_rips, cohombirth_rips, cocycle = self.get_representative_cocycle(
@@ -84,16 +86,17 @@ class LensCoords(EMCoords):
 
         varphi, ball_indx = EMCoords.get_covering_partition(self, r_cover, partunity_fn)
 
-        root_of_unity = -1 if self.prime_ == 2 else np.exp(2*np.pi*1j/self.prime_)
+        root_of_unity = -1 if self.prime_ == 2 else np.exp(2 * np.pi * 1j / self.prime_)
 
-        cocycle_matrix = np.ones((n_landmarks, n_landmarks))
-        cocycle_matrix[cocycle[:, 0], cocycle[:, 1]] = root_of_unity**cocycle[:,2]
-        cocycle_matrix[cocycle[:, 1], cocycle[:, 0]] = (1/root_of_unity)**cocycle[:,2]
-        class_map = np.sqrt(varphi.T)
-        for i in range(n_data):
-            class_map[i, :] *= cocycle_matrix[ball_indx[i], :]
+        cocycle_matrix = np.ones(
+            (n_landmarks, n_landmarks), dtype=float if self.prime_ == 2 else np.complex_
+        )
+        cocycle_matrix[cocycle[:, 0], cocycle[:, 1]] = root_of_unity ** cocycle[:, 2]
+        cocycle_matrix[cocycle[:, 1], cocycle[:, 0]] = (1 / root_of_unity) ** cocycle[:, 2]
 
-        epca = EquivariantPCA.ppca(class_map, lens_dim, self.verbose)
+        class_map = np.sqrt(varphi.T) * cocycle_matrix[ball_indx[:], :]
+
+        epca = EquivariantPCA.ppca(class_map, lens_dim, projective_dim_red_mode, self.verbose)
         self.variance_ = epca["variance"]
 
         return epca["X"]
