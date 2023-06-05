@@ -8,6 +8,9 @@ Purpose: To provide a number of utility functions, including
 import time
 import numpy as np
 import scipy.sparse as sparse
+from scipy.spatial import KDTree
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import shortest_path
 from numba import jit
 from .combinatorial import (
     combinatorial_number_system_forward,
@@ -154,12 +157,38 @@ class GeometryUtils:
         DLandmarks = D[perm, :]
         return {"perm": perm, "lambdas": lambdas, "DLandmarks": DLandmarks}
 
+
     @staticmethod
-    def geodesic_distance_estimate(X, n_neighbors):
-        from sklearn.manifold import Isomap
-        embedding = Isomap(n_neighbors=n_neighbors)
-        embedding.fit(X)
-        return embedding.dist_matrix_
+    def landmark_geodesic_distance(X, n_landmarks, n_neighbors):
+        spatial_tree = KDTree(X)
+        distances_nn, indices_nn = spatial_tree.query(X,k=n_neighbors)
+        # https://github.com/scikit-learn/scikit-learn/blob/364c77e047ca08a95862becf40a04fe9d4cd2c98/sklearn/neighbors/_base.py#L997
+        n_queries = X.shape[0]
+        n_nonzero = n_queries * n_neighbors
+        indptr = np.arange(0, n_nonzero + 1, n_neighbors)
+        kneighbors_graph = csr_matrix(
+            (distances_nn.ravel(), indices_nn.ravel(), indptr), shape=(n_queries, n_queries)
+        )
+
+        # furthest point sampling
+        n_points = X.shape[0]
+        perm = np.zeros(n_landmarks, dtype=np.int64)
+        lambdas = np.zeros(n_landmarks)
+        ds = shortest_path(kneighbors_graph, indices = 0, directed=False)
+        D = np.zeros((n_landmarks, n_points))
+        D[0, :] = ds
+        for i in range(1, n_landmarks):
+            idx = np.argmax(ds)
+            perm[i] = idx
+            lambdas[i] = ds[idx]
+            thisds  = shortest_path(kneighbors_graph, indices = idx, directed=False)
+            D[i, :] = thisds
+            ds = np.minimum(ds, thisds)
+
+        perm_rest_points = np.setdiff1d(np.arange(0,n_points, dtype=int), perm, assume_unique=True)
+        perm_all_points = np.concatenate((perm,perm_rest_points))
+
+        return D[:,perm_all_points], perm_all_points
 
 
 class CohomologyUtils:
