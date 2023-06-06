@@ -78,7 +78,7 @@ class ProjectiveCoords(LensCoords):
             self,
             perc=perc,
             cocycle_idx=cocycle_idx,
-            lens_dim=proj_dim,
+            lens_dim=proj_dim+1,
             partunity_fn=partunity_fn,
             standard_range=standard_range,
             projective_dim_red_mode=projective_dim_red_mode,

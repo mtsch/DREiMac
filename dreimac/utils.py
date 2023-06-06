@@ -1103,6 +1103,44 @@ class GeometryExamples:
             + (np.random.random((n_samples, 2)) - 0.5) * 0.2
         )
 
+    @staticmethod
+    def moore_space_distance_matrix(rough_n_points=2000, prime=3):
+        np.random.seed(0)
+        X = (np.random.random((rough_n_points,2)) - 0.5) * 2
+        X = X[np.linalg.norm(X,axis=1)<= 1]
+        q = prime
+
+        def _rot_mat(theta):
+            c, s = np.cos(theta), np.sin(theta)
+            return np.array(((c, -s), (s, c)))
+
+        R = _rot_mat((2 * np.pi) / q)
+
+        n_points = X.shape[0]
+        dist_mat = np.zeros((n_points, n_points))
+
+        @jit
+        def _fill_dist_mat(X, dist_mat, rot_mat, prime):
+            for i, x in enumerate(X):
+                for j, y in enumerate(X):
+                    proj_x_to_boundary = x / np.linalg.norm(x)
+
+                    dist_mat[i, j] = min(
+                        # stay inside disk
+                        np.linalg.norm(x - y),
+                        # go to boundary and then to y
+                        np.linalg.norm(x - proj_x_to_boundary)
+                        + min(
+                            [
+                                np.linalg.norm(
+                                    np.linalg.matrix_power(rot_mat, i) @ proj_x_to_boundary - y
+                                )
+                                for i in range(prime)
+                            ]
+                        ),
+                    )
+        _fill_dist_mat(X, dist_mat, R, prime)
+        return dist_mat, X
 
 class CircleMapUtils:
     """

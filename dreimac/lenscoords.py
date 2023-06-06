@@ -44,13 +44,13 @@ class LensCoords(EMCoords):
         self,
         perc=0.9,
         cocycle_idx=0,
-        lens_dim=1,
+        lens_dim=2,
         partunity_fn=PartUnity.linear,
         standard_range=True,
         projective_dim_red_mode="one-by-one"
     ):
         """
-        Get real projective coordinates.
+        Get lens coordinates.
 
         Parameters
         ----------
@@ -96,7 +96,7 @@ class LensCoords(EMCoords):
 
         class_map = np.sqrt(varphi.T) * cocycle_matrix[ball_indx[:], :]
 
-        epca = EquivariantPCA.ppca(class_map, lens_dim, projective_dim_red_mode, self.verbose)
+        epca = EquivariantPCA.ppca(class_map, lens_dim-1, projective_dim_red_mode, self.verbose)
         self.variance_ = epca["variance"]
 
         return epca["X"]
