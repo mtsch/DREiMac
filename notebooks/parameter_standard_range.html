@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Choosing the parameter standard_range &mdash; DREiMac  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Choosing the parameters prime and check_cocycle_condition" href="parameters_prime_and_check_cocycle_condition.html" />
+    <link rel="prev" title="Choosing the parameter perc" href="parameter_perc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            DREiMac
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../theory.html">Theory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Choosing parameters</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="parameters_n_landmarks_and_cocycle_idx.html">Choosing the parameters n_landmarks and cocycle_idx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter_perc.html">Choosing the parameter perc</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Choosing the parameter standard_range</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters_prime_and_check_cocycle_condition.html">Choosing the parameters prime and check_cocycle_condition</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Circular coordinates</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="coil20.html">Circular coordinates on COIL-20 data set</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toroidal coordinates</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bullseye.html">Toroidal coordinates on bullseye</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genusTwoSurface.html">Toroidal coordinates on surface of genus two</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Real projective coordinates</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ImagePatches.html">Real projective coordinates on data set of image patches</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Complex projective coordinates</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="twoSphere.html">Complex projective coordinates on a 2-sphere</a></li>
+<li class="toctree-l1"><a class="reference internal" href="movingDot.html">Complex projective coordinates on data set of image patches</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Lens coordinates</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="circleLensCoordinates.html">Lens coordinates on a circle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MooreSpace.html">Lens coordinates on Moore space</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DREiMac</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Choosing the parameter standard_range</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/notebooks/parameter_standard_range.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Choosing-the-parameter-standard_range">
+<h1>Choosing the parameter standard_range<a class="headerlink" href="#Choosing-the-parameter-standard_range" title="Permalink to this heading"></a></h1>
+<p>The purpose of this example is to demonstrate the effect of the standard_range parameter.</p>
+<p>For efficiency reasons, the algorithms implemented in this library work with Rips complexes; however, when this parameter is set to True, the output of the algorithms are guaranteed to represent non-trivial, continuous maps on the Čech complex of the data. In order to be able to guarantee this, the persistent cohomology class has to be sufficiently long, in the following sense: if the persistent cohomology class is represented by a point <span class="math notranslate nohighlight">\((a,b)\)</span> in the persistence diagram, we must have
+<span class="math notranslate nohighlight">\(2a &lt; b\)</span>. If <span class="math notranslate nohighlight">\(2a \geq b\)</span> and standard_range is set to True, the algorithm will return an error, and suggest setting standard_range to False.</p>
+<p>The user can then decide to set standard_range to False, or to increase the parameter n_landmarks, which often results in a persistence diagram with classes that are born earlier (i.e., classes <span class="math notranslate nohighlight">\((a,b)\)</span> for which <span class="math notranslate nohighlight">\(a\)</span> is smaller).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">dreimac</span> <span class="kn">import</span> <span class="n">CircularCoords</span><span class="p">,</span> <span class="n">GeometryExamples</span><span class="p">,</span> <span class="n">CircleMapUtils</span>
+<span class="kn">from</span> <span class="nn">persim</span> <span class="kn">import</span> <span class="n">plot_diagrams</span>
+</pre></div>
+</div>
+</div>
+<p>We consider two datasets, both consisting of a noisy circle with different levels of noise. We start with a not very noisy circle.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">width_ratios</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="n">X1</span> <span class="o">=</span> <span class="n">GeometryExamples</span><span class="o">.</span><span class="n">noisy_circle</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">noise_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="n">a0</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X1</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">X1</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">a0</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Not very noisy circle&quot;</span><span class="p">)</span> <span class="p">;</span> <span class="n">a0</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span> <span class="p">;</span> <span class="n">a0</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+
+<span class="n">cc</span> <span class="o">=</span> <span class="n">CircularCoords</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">prime</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plot_diagrams</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">dgms_</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">a1</span><span class="p">)</span>
+
+<span class="n">circular_coordinates</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">standard_range</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">a2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X1</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">X1</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">CircleMapUtils</span><span class="o">.</span><span class="n">to_sinebow</span><span class="p">(</span><span class="n">circular_coordinates</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">a2</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span> <span class="p">;</span> <span class="n">a2</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_parameter_standard_range_3_0.png" src="../_images/notebooks_parameter_standard_range_3_0.png" />
+</div>
+</div>
+<p>Now for a quite noisy circle.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">width_ratios</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="n">X2</span> <span class="o">=</span> <span class="n">GeometryExamples</span><span class="o">.</span><span class="n">noisy_circle</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">noise_size</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+<span class="n">a0</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X2</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">X2</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span>
+<span class="n">a0</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Very noisy circle&quot;</span><span class="p">)</span> <span class="p">;</span> <span class="n">a0</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span> <span class="p">;</span> <span class="n">a0</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+
+<span class="n">cc2</span> <span class="o">=</span> <span class="n">CircularCoords</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">prime</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plot_diagrams</span><span class="p">(</span><span class="n">cc2</span><span class="o">.</span><span class="n">dgms_</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">a1</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_parameter_standard_range_5_0.png" src="../_images/notebooks_parameter_standard_range_5_0.png" />
+</div>
+</div>
+<p>Using the most persistent class to construct a circular coordinate with standard_range equals to True results in an error, as described above:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">circular_coordinates</span> <span class="o">=</span> <span class="n">cc2</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">standard_range</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">Exception</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[4], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> circular_coordinates = cc2.get_coordinates(standard_range=True)
+
+File <span class="ansi-green-fg">~/code/DREiMac/dreimac/circularcoords.py:76</span>, in <span class="ansi-cyan-fg">CircularCoords.get_coordinates</span><span class="ansi-blue-fg">(self, perc, cocycle_idx, partunity_fn, standard_range, check_cocycle_condition)</span>
+<span class="ansi-green-intense-fg ansi-bold">     41</span> def get_coordinates(
+<span class="ansi-green-intense-fg ansi-bold">     42</span>     self,
+<span class="ansi-green-intense-fg ansi-bold">     43</span>     perc=0.5,
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">     47</span>     check_cocycle_condition=True,
+<span class="ansi-green-intense-fg ansi-bold">     48</span> ):
+<span class="ansi-green-intense-fg ansi-bold">     49</span>     &#34;&#34;&#34;
+<span class="ansi-green-intense-fg ansi-bold">     50</span>     Get circular coordinates.
+<span class="ansi-green-intense-fg ansi-bold">     51</span>
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">     73</span>         Circular coordinates
+<span class="ansi-green-intense-fg ansi-bold">     74</span>     &#34;&#34;&#34;
+<span class="ansi-green-fg">---&gt; 76</span>     return ToroidalCoords.get_coordinates(
+<span class="ansi-green-intense-fg ansi-bold">     77</span>         self,
+<span class="ansi-green-intense-fg ansi-bold">     78</span>         perc,
+<span class="ansi-green-intense-fg ansi-bold">     79</span>         [cocycle_idx],
+<span class="ansi-green-intense-fg ansi-bold">     80</span>         partunity_fn,
+<span class="ansi-green-intense-fg ansi-bold">     81</span>         standard_range,
+<span class="ansi-green-intense-fg ansi-bold">     82</span>         check_cocycle_condition,
+<span class="ansi-green-intense-fg ansi-bold">     83</span>     )[0]
+
+File <span class="ansi-green-fg">~/code/DREiMac/dreimac/toroidalcoords.py:105</span>, in <span class="ansi-cyan-fg">ToroidalCoords.get_coordinates</span><span class="ansi-blue-fg">(self, perc, cocycle_idxs, partunity_fn, standard_range, check_cocycle_condition)</span>
+<span class="ansi-green-intense-fg ansi-bold">     99</span> integer_cocycles = [
+<span class="ansi-green-intense-fg ansi-bold">    100</span>     CohomologyUtils.lift_to_integer_cocycle(cocycle, prime=self.prime_)
+<span class="ansi-green-intense-fg ansi-bold">    101</span>     for cocycle in cocycles
+<span class="ansi-green-intense-fg ansi-bold">    102</span> ]
+<span class="ansi-green-intense-fg ansi-bold">    104</span> # determine radius for balls
+<span class="ansi-green-fg">--&gt; 105</span> r_cover, rips_threshold = EMCoords.get_cover_radius(
+<span class="ansi-green-intense-fg ansi-bold">    106</span>     self, perc, cohomdeath_rips, cohombirth_rips, standard_range
+<span class="ansi-green-intense-fg ansi-bold">    107</span> )
+<span class="ansi-green-intense-fg ansi-bold">    109</span> # compute partition of unity and choose a cover element for each data point
+<span class="ansi-green-intense-fg ansi-bold">    110</span> varphi, ball_indx = EMCoords.get_covering_partition(self, r_cover, partunity_fn)
+
+File <span class="ansi-green-fg">~/code/DREiMac/dreimac/emcoords.py:144</span>, in <span class="ansi-cyan-fg">EMCoords.get_cover_radius</span><span class="ansi-blue-fg">(self, perc, cohomdeath_rips, cohombirth_rips, standard_range)</span>
+<span class="ansi-green-intense-fg ansi-bold">    142</span> end = cohombirth_rips
+<span class="ansi-green-intense-fg ansi-bold">    143</span> if start &gt; end:
+<span class="ansi-green-fg">--&gt; 144</span>     raise Exception(
+<span class="ansi-green-intense-fg ansi-bold">    145</span>         &#34;The cohomology class selected is too short, try setting standard_range to False.&#34;
+<span class="ansi-green-intense-fg ansi-bold">    146</span>     )
+<span class="ansi-green-intense-fg ansi-bold">    147</span> self.rips_threshold_ = (1 - perc) * start + perc * end
+<span class="ansi-green-intense-fg ansi-bold">    148</span> self.r_cover_ = self.rips_threshold_ / 2
+
+<span class="ansi-red-fg">Exception</span>: The cohomology class selected is too short, try setting standard_range to False.
+</pre></div></div>
+</div>
+<p>However, using standard_range equals to False gives a good result, even if the theory does not guarantee this:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">circular_coordinates2</span> <span class="o">=</span> <span class="n">cc2</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">standard_range</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X2</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">X2</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">CircleMapUtils</span><span class="o">.</span><span class="n">to_sinebow</span><span class="p">(</span><span class="n">circular_coordinates2</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span> <span class="p">;</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_parameter_standard_range_9_0.png" src="../_images/notebooks_parameter_standard_range_9_0.png" />
+</div>
+</div>
+<p>As explained above, sometimes another option is to increase the parameter n_landmarks so that persistent cohomology classes are born earlier:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">width_ratios</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="n">cc3</span> <span class="o">=</span> <span class="n">CircularCoords</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">prime</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plot_diagrams</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">dgms_</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">a0</span><span class="p">)</span>
+
+<span class="n">circular_coordinates3</span> <span class="o">=</span> <span class="n">cc3</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">standard_range</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">a1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X2</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">X2</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">CircleMapUtils</span><span class="o">.</span><span class="n">to_sinebow</span><span class="p">(</span><span class="n">circular_coordinates3</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">a1</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span> <span class="p">;</span> <span class="n">a1</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_parameter_standard_range_11_0.png" src="../_images/notebooks_parameter_standard_range_11_0.png" />
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="parameter_perc.html" class="btn btn-neutral float-left" title="Choosing the parameter perc" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="parameters_prime_and_check_cocycle_condition.html" class="btn btn-neutral float-right" title="Choosing the parameters prime and check_cocycle_condition" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Jose A. Perea, Luis Scoccola, Chris Tralie.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
